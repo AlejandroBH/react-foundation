@@ -1,11 +1,19 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReqResUserListResponse, User } from "../interfaces";
 
-const loadUsers = async (): Promise<User[]> => {
+const loadUsers = async (page: number = 1): Promise<User[]> => {
   try {
     const { data } = await axios.get<ReqResUserListResponse>(
-      "https://reqres.in/api/users?page=2"
+      "https://reqres.in/api/users",
+      {
+        headers: {
+          "x-api-key": "reqres-free-v1",
+        },
+        params: {
+          page: page,
+        },
+      }
     );
     return data.data;
   } catch (error) {
@@ -16,10 +24,30 @@ const loadUsers = async (): Promise<User[]> => {
 
 export const UsersPage = () => {
   const [users, setUsers] = useState<User[]>([]);
+  const currentPageRef = useRef(1);
 
   useEffect(() => {
-    loadUsers().then(setUsers);
+    loadUsers(currentPageRef.current).then(setUsers);
   }, []);
+
+  const nexPage = async () => {
+    currentPageRef.current++;
+    const users = await loadUsers(currentPageRef.current);
+
+    if (users.length > 0) {
+      setUsers(users);
+    } else {
+      currentPageRef.current--;
+    }
+  };
+
+  const prevPage = async () => {
+    if (currentPageRef.current < 1) return;
+
+    currentPageRef.current--;
+    const users = await loadUsers(currentPageRef.current);
+    setUsers(users);
+  };
 
   return (
     <>
@@ -38,6 +66,11 @@ export const UsersPage = () => {
           ))}
         </tbody>
       </table>
+
+      <div className="buttons">
+        <button onClick={prevPage}>Prev</button>
+        <button onClick={nexPage}>Next</button>
+      </div>
     </>
   );
 };
