@@ -1,4 +1,4 @@
-import { UsersPage } from "./components";
+import { FormsPage } from "./components";
 
 function App() {
   return (
@@ -10,7 +10,8 @@ function App() {
       {/* <Counter /> */}
       {/* <CounterWithHook /> */}
       {/* <LoginPage /> */}
-      <UsersPage />
+      {/* <UsersPage /> */}
+      <FormsPage />
     </main>
   );
 }
